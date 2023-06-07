@@ -1,8 +1,41 @@
+import { useState } from "react";
+import Task from "../interfaces/Task";
+import TaskServiceFront from "../services/TaskServiceFront";
+import { useNavigate } from "react-router-dom";
+
 export default function CreateTask() {
+
+    const [task, setTask] = useState<Task>({
+        id: undefined,
+        name: "",
+        description: "",
+        creationDate: "",
+        updateDate: "",
+        deadlineDate: "",
+        done: false,
+    });
+
+    const handleChange = (e : React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+        setTask({...task, [e.target.name]: e.target.value})
+    };
+
+    const navigate = useNavigate();
+
+    const saveTask = (e : any) => {
+        e.preventDefault();
+        TaskServiceFront.saveTask(task)
+            .then((response) => {
+                console.log(response);
+                navigate("/")
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
 
     return(
         <>
-            <h2>Create Task</h2>
+            <h1>Create Task</h1>
 
             <div>
                 <label>Name: </label>
@@ -10,6 +43,8 @@ export default function CreateTask() {
                     type="text" 
                     name="name"
                     placeholder="name..."
+                    value={task.name}
+                    onChange={(e) => handleChange(e)}
                 />
             </div>
 
@@ -18,6 +53,8 @@ export default function CreateTask() {
                 <textarea 
                     name="description"
                     placeholder="description..."
+                    value={task.description}
+                    onChange={(e) => handleChange(e)}
                 />
             </div>
 
@@ -26,11 +63,13 @@ export default function CreateTask() {
                 <input
                     type="datetime-local"
                     name="deadlineDate"
+                    value={task.deadlineDate}
+                    onChange={(e) => handleChange(e)}
                 />
             </div>
 
             <div>
-                <button>Add</button>
+                <button onClick={saveTask}>Add</button>
             </div>
         </>
     );
